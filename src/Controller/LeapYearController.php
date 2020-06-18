@@ -2,14 +2,13 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class LeapYearController extends AbstractController
 {
-    public function index(Request $request)
+    public function index(?int $year): Response
     {
-        if ($this->is_leap_year($request->attributes->get('year'))) {
+        if ($this->is_leap_year($year)) {
             return new Response('Yep, this is a leap year!');
         }
 

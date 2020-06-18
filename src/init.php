@@ -3,12 +3,17 @@ require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/routing.php';
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+// use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing;
+use Symfony\Component\HttpKernel;
 
 // INIT HTTP
 $request = Request::createFromGlobals();
-$response = new Response();
+// $response = new Response();
+
+// INIT HTTP KERNEL RESOLVER
+$controllerResolver = new HttpKernel\Controller\ControllerResolver();
+$argumentResolver = new HttpKernel\Controller\ArgumentResolver();
 
 // INIT ROUTING
 $context = new Routing\RequestContext;

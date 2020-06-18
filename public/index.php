@@ -7,7 +7,12 @@ use Symfony\Component\Routing;
 
 try {
     $request->attributes->add($matcher->match($request->getPathInfo()));
-    $response = call_user_func($request->attributes->get('_controller'), $request);
+
+    $controller = $controllerResolver->getController($request);
+    $arguments = $argumentResolver->getArguments($request, $controller);
+
+    $response = call_user_func_array($controller, $arguments);
+    // $response = call_user_func($request->attributes->get('_controller'), $request);
 } catch (Routing\Exception\ResourceNotFoundException $exception) {
     $response = new Response('Not Found', 404);
 } catch (Exception $exception) {
