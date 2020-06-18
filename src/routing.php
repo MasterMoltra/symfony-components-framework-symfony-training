@@ -1,21 +1,23 @@
 <?php
 
-use Symfony\Component\Routing;
+use App\Controller\BaseController;
 use App\Controller\LeapYearController;
+use Symfony\Component\Routing;
 
 $routes = new Routing\RouteCollection();
 $routes->add('hello', new Routing\Route('/hello/{name}', [
     'name' => 'World',
-    '_controller' => 'render_template',
+    '_controller' => [new BaseController, 'render_template']
 ]));
 
 $routes->add('bye', new Routing\Route('/bye', [
     '_controller' => function ($request) {
+        $controller = new BaseController();
+
         // $foo will be available in the template
         $request->attributes->set('extra', 'byebye');
 
-        $response = render_template($request);
-
+        $response = $controller->render_template($request);
         // change some header
         $response->headers->set('Content-Type', 'text/plain');
 
