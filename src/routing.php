@@ -1,21 +1,20 @@
 <?php
 
-use App\Controller\BaseController;
-use App\Controller\LeapYearController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing;
 
 $routes = new Routing\RouteCollection();
 $routes->add('hello', new Routing\Route('/hello/{name}', [
     'name' => 'World',
-    '_controller' => [new BaseController, 'render_template']
+    '_controller' => 'App\Simplex\Controller\BaseController::render_template'
 ]));
 
 $routes->add('bye', new Routing\Route('/bye', [
-    '_controller' => function ($request) {
-        $controller = new BaseController();
+    '_controller' => function (Request $request) {
+        $controller = new App\Simplex\Controller\BaseController;
 
         // $foo will be available in the template
-        $request->attributes->set('extra', 'byebye');
+        $request->attributes->set('extra', '+ Extra bye bye Param');
 
         $response = $controller->render_template($request);
         // change some header
@@ -27,5 +26,5 @@ $routes->add('bye', new Routing\Route('/bye', [
 
 $routes->add('leap_year', new Routing\Route('/islpyear/{year}', [
     'year' => null,
-    '_controller' => [new LeapYearController, 'index']
+    '_controller' => 'App\Calendar\Controller\LeapYearController::index'
 ]));

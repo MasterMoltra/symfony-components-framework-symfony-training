@@ -17,7 +17,7 @@ $argumentResolver = new HttpKernel\Controller\ArgumentResolver();
 
 // INIT ROUTING
 $context = new Routing\RequestContext;
-$context->fromRequest($request);
+// $context->fromRequest($request);
 
 // $matcher = new Routing\Matcher\UrlMatcher($routes, $context);
 // For better performance convert in a plain PHP array
