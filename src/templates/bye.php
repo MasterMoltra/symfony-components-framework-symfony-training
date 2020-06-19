@@ -1,5 +1,4 @@
 <?php
 
-
-echo "Goodbye! ";
+echo 'Goodbye! ';
 echo $extra ?? '';

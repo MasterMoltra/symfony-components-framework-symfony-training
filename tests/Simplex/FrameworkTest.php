@@ -2,22 +2,27 @@
 
 namespace Tests\Simplex;
 
-use PHPUnit\Framework\TestCase;
-use App\Simplex\Framework;
 use App\Calendar\Controller\LeapYearController;
+use App\Simplex\Framework;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
-use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
+use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\Routing;
 use Symfony\Component\Routing\Exception;
 
+/**
+ * @covers \Framework
+ *
+ * @internal
+ */
 class FrameworkTest extends TestCase
 {
     public function testNotFoundHandling(): void
     {
-        $framework = $this->getFrameworkForException(new Exception\ResourceNotFoundException);
+        $framework = $this->getFrameworkForException(new Exception\ResourceNotFoundException());
 
         $response = $framework->handle(new Request());
 
@@ -37,7 +42,7 @@ class FrameworkTest extends TestCase
     {
         $controllerResolver = new ControllerResolver();
         $argumentResolver = new ArgumentResolver();
-        /** @var Routing\Matcher\UrlMatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Routing\Matcher\UrlMatcherInterface */
         $matcher = $this->createMock(Routing\Matcher\UrlMatcherInterface::class);
         // use getMock() on PHPUnit 5.3 or below
         // $matcher = $this->getMock(Routing\Matcher\UrlMatcherInterface::class);
@@ -48,13 +53,14 @@ class FrameworkTest extends TestCase
             ->will($this->returnValue([
                 '_route' => 'is_leap_year/{year}',
                 'year' => '2020',
-                '_controller' => [new LeapYearController, 'index']
-            ]));
+                '_controller' => [new LeapYearController(), 'index'],
+            ]))
+        ;
         $matcher
             ->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)));
-
+            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)))
+        ;
 
         $framework = new Framework($matcher, $controllerResolver, $argumentResolver);
 
@@ -70,7 +76,7 @@ class FrameworkTest extends TestCase
         $controllerResolver = $this->createMock(ControllerResolverInterface::class);
         /** @var ArgumentResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
         $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
-        /** @var Routing\Matcher\UrlMatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Routing\Matcher\UrlMatcherInterface */
         $matcher = $this->createMock(Routing\Matcher\UrlMatcherInterface::class);
         // use getMock() on PHPUnit 5.3 or below
         // $matcher = $this->getMock(Routing\Matcher\UrlMatcherInterface::class);
@@ -78,11 +84,13 @@ class FrameworkTest extends TestCase
         $matcher
             ->expects($this->once())
             ->method('match')
-            ->will($this->throwException($exception));
+            ->will($this->throwException($exception))
+        ;
         $matcher
             ->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)));
+            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)))
+        ;
 
         return new Framework($matcher, $controllerResolver, $argumentResolver);
     }
