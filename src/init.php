@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/routing.php';
 
@@ -14,15 +17,6 @@ $request = Request::createFromGlobals();
 // INIT HTTP KERNEL RESOLVER
 $controllerResolver = new HttpKernel\Controller\ControllerResolver();
 $argumentResolver = new HttpKernel\Controller\ArgumentResolver();
-
-// INIT ROUTING
-$context = new Routing\RequestContext;
-// $context->fromRequest($request);
-
-// $matcher = new Routing\Matcher\UrlMatcher($routes, $context);
-// For better performance convert in a plain PHP array
-$compiledRoutes = (new Routing\Matcher\Dumper\CompiledUrlMatcherDumper($routes))->getCompiledRoutes();
-$matcher = new Routing\Matcher\CompiledUrlMatcher($compiledRoutes, $context);
 
 // echo "<pre>";
 // print_r($routes);

@@ -11,7 +11,7 @@ class LeapYearController extends AbstractController
     public function index(?int $year): Response
     {
         $leapYear = new LeapYear;
-        if ($leapYear->is_leap_year($year)) {
+        if ($leapYear->isLeapYear($year)) {
             return new Response('Yep, this is a leap year!');
         }
 
