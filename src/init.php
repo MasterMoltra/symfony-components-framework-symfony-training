@@ -1,13 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/routing.php';
-
 use Symfony\Component\HttpFoundation\Request;
 // use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel;
+
+// INIT AUTOLOAD
+require_once __DIR__ . '/../vendor/autoload.php';
+// INIT ROUTES
+require_once __DIR__ . '/routing.php';
+// INIT DISPATCHER/LSTENERS
+require_once __DIR__ . '/listeners.php';
 
 // INIT HTTP
 $request = Request::createFromGlobals();

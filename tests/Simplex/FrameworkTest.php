@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\Routing;
 use Symfony\Component\Routing\Exception;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @covers \Framework
@@ -44,6 +45,8 @@ class FrameworkTest extends TestCase
         $argumentResolver = new ArgumentResolver();
         /** @var \PHPUnit\Framework\MockObject\MockObject|Routing\Matcher\UrlMatcherInterface */
         $matcher = $this->createMock(Routing\Matcher\UrlMatcherInterface::class);
+        /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
         // use getMock() on PHPUnit 5.3 or below
         // $matcher = $this->getMock(Routing\Matcher\UrlMatcherInterface::class);
 
@@ -54,15 +57,13 @@ class FrameworkTest extends TestCase
                 '_route' => 'is_leap_year/{year}',
                 'year' => '2020',
                 '_controller' => [new LeapYearController(), 'index'],
-            ]))
-        ;
+            ]));
         $matcher
             ->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)))
-        ;
+            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)));
 
-        $framework = new Framework($matcher, $controllerResolver, $argumentResolver);
+        $framework = new Framework($matcher, $controllerResolver, $argumentResolver, $dispatcher);
 
         $response = $framework->handle(new Request());
 
@@ -78,20 +79,20 @@ class FrameworkTest extends TestCase
         $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
         /** @var \PHPUnit\Framework\MockObject\MockObject|Routing\Matcher\UrlMatcherInterface */
         $matcher = $this->createMock(Routing\Matcher\UrlMatcherInterface::class);
+        /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
         // use getMock() on PHPUnit 5.3 or below
         // $matcher = $this->getMock(Routing\Matcher\UrlMatcherInterface::class);
 
         $matcher
             ->expects($this->once())
             ->method('match')
-            ->will($this->throwException($exception))
-        ;
+            ->will($this->throwException($exception));
         $matcher
             ->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)))
-        ;
+            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)));
 
-        return new Framework($matcher, $controllerResolver, $argumentResolver);
+        return new Framework($matcher, $controllerResolver, $argumentResolver, $dispatcher);
     }
 }
