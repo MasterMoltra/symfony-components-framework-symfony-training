@@ -7,17 +7,17 @@ use App\Simplex\Controller\BaseController;
 use App\Simplex\Framework;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
-use Symfony\Component\Routing;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\EventListener;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing;
 
 /**
  * @covers \Framework
@@ -26,17 +26,16 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class FrameworkTest extends TestCase
 {
-
     public function exceptionDataProvider(): \Generator
     {
         yield 'NotFoundHttpException' => [
-            [NotFoundHttpException::class, '404']
+            [NotFoundHttpException::class, '404'],
         ];
         yield 'BadRequestHttpException' => [
-            [BadRequestHttpException::class, '400']
+            [BadRequestHttpException::class, '400'],
         ];
         yield 'RuntimeException' => [
-            [\RuntimeException::class, '500']
+            [\RuntimeException::class, '500'],
         ];
     }
 
@@ -72,7 +71,6 @@ class FrameworkTest extends TestCase
         $dispatcher = new EventDispatcher();
         $requestStack = new RequestStack();
 
-
         $matcher
             ->expects($this->once())
             ->method('match')
@@ -80,11 +78,13 @@ class FrameworkTest extends TestCase
                 '_route' => 'is_leap_year/{year}',
                 'year' => '2020',
                 '_controller' => [new LeapYearController(), 'index'],
-            ]));
+            ]))
+        ;
         $matcher
             ->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)));
+            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)))
+        ;
 
         $dispatcher->addSubscriber(new EventListener\ResponseListener('UTF-8'));
         $dispatcher->addSubscriber(new EventListener\RouterListener($matcher, $requestStack));
@@ -98,11 +98,7 @@ class FrameworkTest extends TestCase
     }
 
     /**
-     * Simulate response with some exceptions
-     *
-     * @param string $exception
-     *
-     * @return \App\Simplex\Framework
+     * Simulate response with some exceptions.
      */
     private function getFrameworkForException(string $exception): Framework
     {
@@ -125,18 +121,20 @@ class FrameworkTest extends TestCase
             ->will($this->returnValue([
                 '_route' => 'hello',
                 '_controller' => [new BaseController(), 'render'],
-            ]));
+            ]))
+        ;
         // ->will($this->throwException(new $exception));
         $matcher
             ->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)));
+            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)))
+        ;
 
         $dispatcher->addSubscriber(new EventListener\RouterListener($matcher, $requestStack));
         // Throw custom exception
         $dispatcher->addListener('kernel.controller', function (ControllerEvent $event) use ($exception) {
             // var_dump("Controller event");
-            throw new $exception("My custom test message");
+            throw new $exception('My custom test message');
         });
         // Simulate http response with my custom the exception info
         $dispatcher->addListener('kernel.exception', function (ExceptionEvent $event) {
@@ -149,7 +147,7 @@ class FrameworkTest extends TestCase
             $customResponse = new JsonResponse(
                 [
                     'status' => false,
-                    'message' => $exception->getMessage()
+                    'message' => $exception->getMessage(),
                 ],
                 method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : 500
             );
@@ -161,9 +159,7 @@ class FrameworkTest extends TestCase
     }
 
     /**
-     * Return a real roting collection list
-     *
-     * @return Routing\RouteCollection
+     * Return a real roting collection list.
      */
     private function getRoutes(): Routing\RouteCollection
     {
