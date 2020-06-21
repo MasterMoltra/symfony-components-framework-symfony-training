@@ -10,6 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -53,7 +54,9 @@ class FrameworkTest extends TestCase
         $response = $framework->handle(new Request());
 
         $this->assertEquals($statusCode, $response->getStatusCode());
-        $this->assertStringContainsString('My custom test message', $response->getContent());
+        $this->assertStringContainsString('ERROR msg form Kernel Event', $response->getContent());
+        // Test throw exception from different hook
+        // $this->assertStringContainsString('ERROR msg form Error Listener', $response->getContent());
     }
 
     /**
@@ -78,13 +81,11 @@ class FrameworkTest extends TestCase
                 '_route' => 'is_leap_year/{year}',
                 'year' => '2020',
                 '_controller' => [new LeapYearController(), 'index'],
-            ]))
-        ;
+            ]));
         $matcher
             ->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)))
-        ;
+            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)));
 
         $dispatcher->addSubscriber(new EventListener\ResponseListener('UTF-8'));
         $dispatcher->addSubscriber(new EventListener\RouterListener($matcher, $requestStack));
@@ -121,26 +122,25 @@ class FrameworkTest extends TestCase
             ->will($this->returnValue([
                 '_route' => 'hello',
                 '_controller' => [new BaseController(), 'render'],
-            ]))
-        ;
-        // ->will($this->throwException(new $exception));
+            ]));
+        //->will($this->throwException(new $exception("ERROR msg form Kernel Event")));
         $matcher
             ->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)))
-        ;
+            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)));
 
         $dispatcher->addSubscriber(new EventListener\RouterListener($matcher, $requestStack));
-        // Throw custom exception
+        // Throw custom exception from event (debug mode)
+        // NOTE: I can throw exception directly from the matcher above
         $dispatcher->addListener('kernel.controller', function (ControllerEvent $event) use ($exception) {
             // var_dump("Controller event");
-            throw new $exception('My custom test message');
+            throw new $exception('ERROR msg form Kernel Event');
         });
-        // Simulate http response with my custom the exception info
+        // Simulate http response with my custom exception
         $dispatcher->addListener('kernel.exception', function (ExceptionEvent $event) {
-            // var_dump("Exeception event")
-            // I can set here if I throw the exception from the matcher above
-            // $event->setThrowable(new $exception("My custom test message"));
+            // var_dump("Exeception event");
+
+            // $event->setThrowable(new $exception("ERROR msg form Kernel Event"));
             $exception = $event->getThrowable();
 
             // create json response and set the nice message from exception
@@ -154,6 +154,22 @@ class FrameworkTest extends TestCase
             // set it as response and it will be sent
             $event->setResponse($customResponse);
         });
+
+        // ALTERNTIVE ... throw exception from matcher and catch it by ErrorListener
+        // $matcher
+        //     ->expects($this->once())
+        //     ->method('match')
+        //     ->will($this->throwException(new $exception("ERROR msg form Error Listener")));
+        // $dispatcher->addSubscriber(new EventListener\ErrorListener(function ($exception) {
+        //     // var_dump("Exeception ErrorListener");
+        //     return new JsonResponse(
+        //         [
+        //             'status' => false,
+        //             'message' => $exception->getMessage(),
+        //         ],
+        //         method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : 500
+        //     );
+        // }));
 
         return new Framework($dispatcher, $controllerResolver, $requestStack, $argumentResolver);
     }
