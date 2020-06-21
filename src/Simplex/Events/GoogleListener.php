@@ -3,6 +3,7 @@
 namespace App\Simplex\Events;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class GoogleListener implements EventSubscriberInterface
 {
@@ -27,6 +28,6 @@ class GoogleListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return ['response' => 'onResponse'];
+        return ['kernel.response' => 'onResponse'];
     }
 }

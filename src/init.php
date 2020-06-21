@@ -1,5 +1,7 @@
 <?php
 
+/** NOTICE: THIS FILE HAS BEEN COMPLETELY REPLACED BY THE DEPENDENCY INJECTION LOGIC */
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel;

@@ -1,5 +1,7 @@
 <?php
 
+/** NOTICE: THIS FILE HAS BEEN COMPLETELY REPLACED BY THE DEPENDENCY INJECTION LOGIC */
+
 use App\Simplex\Events;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\EventListener;
