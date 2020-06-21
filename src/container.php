@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel;
 use Symfony\Component\Routing;
 
 $containerBuilder = new DependencyInjection\ContainerBuilder();
+
 $containerBuilder->register('context', Routing\RequestContext::class);
 $containerBuilder->register('matcher', Routing\Matcher\UrlMatcher::class)
     ->setArguments(['%routes%', new Reference('context')]);
@@ -32,5 +33,16 @@ $containerBuilder->register('framework', App\Simplex\Framework::class)
         new Reference('request_stack'),
         new Reference('argument_resolver'),
     ]);
+
+
+$customListener = include __DIR__ . '/custom_listeners.php';
+foreach ($customListener as $class => $args) {
+    $containerBuilder->register($args[0], $class);
+    $containerBuilder->getDefinition('dispatcher')
+        ->addMethodCall(
+            $args[1],
+            [new Reference($args[0])]
+        );
+}
 
 return $containerBuilder;

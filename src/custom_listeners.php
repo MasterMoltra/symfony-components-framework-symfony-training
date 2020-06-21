@@ -1,19 +1,14 @@
 <?php
 
-use App\Simplex\Events\GoogleListener;
-use App\Simplex\Events\StringResponseListener;
-use Symfony\Component\DependencyInjection\Reference;
+use App\Simplex\Events;
 
-$container->register('listener.string_response', StringResponseListener::class);
-$container->getDefinition('dispatcher')
-    ->addMethodCall(
+return [
+    Events\StringResponseListener::class => [
+        'listener.string_response',
+        'addSubscriber'
+    ],
+    Events\GoogleListener::class => [
+        'listener.google_code',
         'addSubscriber',
-        [new Reference('listener.string_response')]
-    );
-
-$container->register('listener.google_code', GoogleListener::class);
-$container->getDefinition('dispatcher')
-    ->addMethodCall(
-        'addSubscriber',
-        [new Reference('listener.google_code')]
-    );
+    ],
+];

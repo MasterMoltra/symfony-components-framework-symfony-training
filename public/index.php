@@ -9,8 +9,6 @@ $container = include __DIR__ . '/../src/container.php';
 $container->setParameter('routes', include __DIR__ . '/../src/routing.php');
 $container->setParameter('charset', 'UTF-8');
 
-include __DIR__ . '/../src/custom_listeners.php';
-
 $request = Request::createFromGlobals();
 
 $framework = $container->get('framework');
