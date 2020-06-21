@@ -8,8 +8,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LeapYearController extends AbstractController
 {
-    public function index(?int $year): Response
+    public function index(?int $year)
     {
+        if ($year === 0000) {
+            return "Return a string instead ok an object from the controller!!!";
+        }
+
         $leapYear = new LeapYear();
         if ($leapYear->isLeapYear($year)) {
             $response = new Response('Yep, this is a leap year!' . rand());

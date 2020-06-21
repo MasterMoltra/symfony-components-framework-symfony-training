@@ -4,7 +4,7 @@ use Symfony\Component\HttpKernel;
 
 require_once __DIR__ . '/../src/init.php';
 
-$framework = new App\Simplex\Framework($matcher, $controllerResolver, $argumentResolver, $dispatcher);
+$framework = new App\Simplex\Framework($dispatcher, $controllerResolver, $requestStack, $argumentResolver);
 $framework = new HttpKernel\HttpCache\HttpCache(
     $framework,
     new HttpKernel\HttpCache\Store(__DIR__ . '/../cache'),
