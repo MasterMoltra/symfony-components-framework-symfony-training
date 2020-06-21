@@ -149,7 +149,7 @@ class FrameworkTest extends TestCase
                     'status' => false,
                     'message' => $exception->getMessage(),
                 ],
-                method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : 500
+                method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR
             );
             // set it as response and it will be sent
             $event->setResponse($customResponse);
