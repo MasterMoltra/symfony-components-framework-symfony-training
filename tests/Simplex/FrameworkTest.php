@@ -82,11 +82,13 @@ class FrameworkTest extends TestCase
                 '_route' => 'is_leap_year/{year}',
                 'year' => '2020',
                 '_controller' => [new LeapYearController(), 'index'],
-            ]));
+            ]))
+        ;
         $matcher
             ->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)));
+            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)))
+        ;
 
         $dispatcher->addSubscriber(new EventListener\ResponseListener('UTF-8'));
         $dispatcher->addSubscriber(new EventListener\RouterListener($matcher, $requestStack));
@@ -123,12 +125,14 @@ class FrameworkTest extends TestCase
             ->will($this->returnValue([
                 '_route' => 'hello',
                 '_controller' => [new BaseController(), 'render'],
-            ]));
+            ]))
+        ;
         //->will($this->throwException(new $exception("ERROR msg form Kernel Event")));
         $matcher
             ->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)));
+            ->will($this->returnValue($this->createMock(Routing\RequestContext::class)))
+        ;
 
         $dispatcher->addSubscriber(new EventListener\RouterListener($matcher, $requestStack));
         // Throw custom exception from event (debug mode)
