@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing;
 
@@ -149,7 +150,9 @@ class FrameworkTest extends TestCase
                     'status' => false,
                     'message' => $exception->getMessage(),
                 ],
-                method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR
+                ($exception instanceof HttpExceptionInterface) ?
+                    $exception->getStatusCode() :
+                    Response::HTTP_INTERNAL_SERVER_ERROR
             );
             // set it as response and it will be sent
             $event->setResponse($customResponse);
